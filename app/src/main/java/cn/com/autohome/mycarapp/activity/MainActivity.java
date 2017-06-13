@@ -11,19 +11,28 @@ import android.widget.Toast;
 
 import cn.com.autohome.mycarapp.R;
 import cn.com.autohome.mycarapp.utils.NetUtil;
+import cn.com.autohome.mycarapp.view.ProgressArcView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
+    ProgressArcView processArc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView bt1 = (TextView) findViewById(R.id.bt1);
         TextView bt2 = (TextView) findViewById(R.id.bt2);
+        processArc = (ProgressArcView) findViewById(R.id.processArc);
+
+        initView();
 
         bt1.setOnClickListener(this);
         bt2.setOnClickListener(this);
         checkNet();
+    }
+
+    private void initView() {
+        processArc.setProcess(0.48f);
+        processArc.startAnimation();
     }
 
     private void checkNet() {

@@ -31,4 +31,9 @@
         android:background="#339999"
         android:textColor="#ffffff"
         />
+
+    <cn.com.autohome.mycarapp.view.ProgressArcView
+        android:id="@+id/processArc"
+        android:layout_width="120dp"
+        android:layout_height="120dp" />
 </LinearLayout>
