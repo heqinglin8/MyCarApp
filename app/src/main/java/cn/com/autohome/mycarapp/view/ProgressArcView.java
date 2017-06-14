@@ -5,11 +5,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
 
 /**
  * 作者/author：何清林（Administrator） refer from panghongwei
@@ -49,12 +50,14 @@ public class ProgressArcView extends View {
 
     private float endAngle = 360;  //默认360度
 
-    /**      * 动画时长      */
+    /**
+     * 动画时长
+     */
     private int animationLength = 1000;
 
-    private String title = "全款参考";
-    private String price = "41.68万";
-    private String disc = "参考价：45.58万";
+    private String titleText = "全款参考";
+    private String priceText = "41.68万";
+    private String discText = "裸车价参考45.58万";
 
     public ProgressArcView(Context context) {
         super(context);
@@ -85,25 +88,46 @@ public class ProgressArcView extends View {
         drawInText(canvas, centerX);
     }
 
+    private void drawRectView(Canvas canvas,Paint paint) {
+        Rect rect = new Rect();
+        paint.getTextBounds(priceText, 0, priceText.length(), rect);//测量获得文字属性
+        float width = rect.width();
+        float height = rect.height();
+
+        float centerX = getWidth() / 2;
+        RectF rectF = new RectF();
+        rectF.setEmpty();
+        rectF.set((int) (centerX - width / 2), (int) (centerX - height / 2), (int) (centerX - width / 2 + 10), (int) (centerX + height / 2));
+        paint.setColor(Color.parseColor("#4dffffff"));
+        canvas.drawRect(rectF, paint);
+    }
+
 
     private void drawInText(Canvas canvas, float centerX) {
         Paint paint = new Paint();
         paint.setColor(color);
+        paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);
+        Rect rect = new Rect();
         //画第一行文字
-        int textsize = 30;
+        int textsize = dipToPx(13);
         paint.setTextSize(textsize);
-        canvas.drawText(title, 0 + centerX, 0 + centerX / 2 + textsize / 2, paint);
+        paint.getTextBounds(titleText, 0, titleText.length(), rect);//测量获得文字属性
+        canvas.drawText(titleText, 0 + centerX, 0 + centerX / 2 + rect.height() / 2 + dipToPx(5), paint);
 
         //画第二行文字
-        textsize = 50;
+        textsize = dipToPx(20);
         paint.setTextSize(textsize);
-        canvas.drawText(price, 0 + centerX, 0 + centerX + textsize / 2, paint);
+        paint.getTextBounds(priceText, 0, priceText.length(), rect);//测量获得文字属性
+        canvas.drawText(priceText, 0 + centerX, 0 + centerX + rect.height() / 2, paint);
+        //话一个亮色
+        drawRectView(canvas,paint);
 
         //画第三行文字
-        textsize = 20;
+        textsize = dipToPx(10);
         paint.setTextSize(textsize);
-        canvas.drawText(disc, 0 + centerX, 0 + centerX + centerX / 2 + textsize / 2, paint);
+        paint.getTextBounds(discText, 0, discText.length(), rect);//测量获得文字属性
+        canvas.drawText(discText, 0 + centerX, 0 + centerX + centerX / 2 + rect.height() / 2 - dipToPx(5), paint);
     }
 
     private void drawFadeCircle(Canvas canvas, RectF rectF) {
@@ -160,8 +184,38 @@ public class ProgressArcView extends View {
         invalidate();
     }
 
-    public void setProcess(float process){
+    public void setProcess(float process) {
         endAngle = 360 * process;
+        invalidate();
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+        invalidate();
+    }
+
+    public void setStartAngle(int startAngle) {
+        this.startAngle = startAngle;
+        invalidate();
+    }
+
+    public void setAnimationLength(int animationLength) {
+        this.animationLength = animationLength;
+    }
+
+    public void setTitleText(String titleText) {
+        this.titleText = titleText;
+        invalidate();
+    }
+
+    public void setPriceText(String priceText) {
+        this.priceText = priceText;
+        invalidate();
+    }
+
+    public void setDiscText(String discText) {
+        this.discText = discText;
+        invalidate();
     }
 
     /*** 开始属性动画      */
@@ -171,7 +225,7 @@ public class ProgressArcView extends View {
     }
 
     private void setAnimation(float startAngle, float endAngle, int animationLength) {
-        ValueAnimator processAnimator = ValueAnimator.ofFloat(startAngle,endAngle);
+        ValueAnimator processAnimator = ValueAnimator.ofFloat(startAngle, endAngle);
         processAnimator.setDuration(animationLength);
         processAnimator.setTarget(currentAngle);
         processAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -179,6 +233,7 @@ public class ProgressArcView extends View {
             public void onAnimationUpdate(ValueAnimator animation) {
                 currentAngle = (float) animation.getAnimatedValue();
                 invalidate();
+                Log.i("hql", "currentAngle:" + currentAngle);
             }
         });
         processAnimator.start();
